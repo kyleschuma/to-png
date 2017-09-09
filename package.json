@@ -1,6 +1,6 @@
 {
   "name": "to-png",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An easy way of creating PNG images from given DOM element.",
   "main": "to-png.js",
   "scripts": {
