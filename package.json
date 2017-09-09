@@ -5,7 +5,6 @@
   "main": "to-png.js",
   "scripts": {
     "build": "webpack",
-    "install": "webpack",
     "test": "webpack-dev-server"
   },
   "keywords": [
