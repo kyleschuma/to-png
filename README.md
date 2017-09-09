@@ -7,7 +7,7 @@ An easy way of creating PNG image from given DOM element.
 import toPng from 'to-png';
 
 const element = document.getElementById('source')
-toPng(el)
+toPng(element)
   .then(image => {
     // do something with the image
     console.log(image);
