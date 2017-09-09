@@ -4,6 +4,7 @@
   "description": "An easy way of creating PNG images from given DOM element.",
   "main": "to-png.js",
   "scripts": {
+    "build": "webpack",
     "install": "webpack",
     "test": "webpack-dev-server"
   },

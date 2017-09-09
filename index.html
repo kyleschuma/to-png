@@ -46,8 +46,8 @@
     var copy   = document.getElementById('copy');
     var copyx2 = document.getElementById('copyx2');
 
-    function toPng(el, opts) {
-      return window['to-png'].default(el, opts);
+    function toPng(el, scale) {
+      return window['to-png'].default(el, scale);
     }
 
     copy.onclick = function copy() {
@@ -57,7 +57,7 @@
     };
 
     copyx2.onclick = function copy() {
-      toPng(source, { scale: 2}).then(function (img) {
+      toPng(source, 2).then(function (img) {
         target.src = img;
       });
     };

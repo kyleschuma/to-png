@@ -29,7 +29,7 @@ const cloneElement = el => {
   return clone;
 };
 
-const toCanvas = (el, { scale=1 }) =>
+const toCanvas = (el, scale=1) =>
   toImage(el).then(image => {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
@@ -64,6 +64,6 @@ const toImage = el => new Promise((resolve, reject) => {
   image.src = uri;
 });
 
-export default (el, opts={ scale: 1}) =>
-  toCanvas(el, opts)
+export default (...args) =>
+  toCanvas(...args)
     .then(canvas => canvas.toDataURL());
