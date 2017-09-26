@@ -6,7 +6,7 @@ module.exports = {
   },
   entry: './index.js',
   output: {
-    filename: 'to-png.js',
+    filename: './dist/to-png.js',
     library: 'to-png',
     libraryTarget: 'umd'
   },
