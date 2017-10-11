@@ -1,5 +1,5 @@
 # to-png
-An easy way of creating PNG image from given DOM element.
+An easy way to create PNG image from given DOM element.
 
 ## Usage
 
@@ -10,7 +10,7 @@ const element = document.getElementById('source')
 toPng(element)
   .then(image => {
     // do something with the image
-    console.log(image);
+    console.log(image.dataUrl);
   })
   .catch(err => {
     // do something with the error
@@ -28,6 +28,4 @@ toPng(element)
 
 ### Known Issues
 
-This library does not work with Internet Explorer or Edge browsers.  
-
-If you must support Internet Explorer or Edge browsers, consult https://github.com/kyleschuma/to-png-foh#readme for a workaround for these browsers. 
+This library does not work with Internet Explorer or Edge browsers due to these browsers not supporting the foreignObjects tag in SVG.    

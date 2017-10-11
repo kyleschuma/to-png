@@ -1,3 +1,20 @@
+
+const getDefaultStyle = el => {
+
+  const dummy = document.createElement(el.tagName);
+  document.body.appendChild(dummy);
+
+  const source = window.getComputedStyle(dummy);
+  const style = [ ...source ].reduce((res, name) => {
+    res[name] = source.getPropertyValue(name);
+    return res;
+  }, {});
+
+  document.body.removeChild(dummy);
+
+  return style;
+};
+
 const cloneElement = el => {
 
   // create a copy of the element
@@ -12,25 +29,29 @@ const cloneElement = el => {
 
     // apply styles
     //
+    const def    = getDefaultStyle(el);
     const source = window.getComputedStyle(el);
     const target = clone.style;
 
-    [ ...source ].forEach(name =>
-      target.setProperty(name,
-        source.getPropertyValue(name),
-        source.getPropertyPriority(name)
-      )
-    );
+    [ ...source ].forEach(name => {
+
+      const value    = source.getPropertyValue(name);
+      const priority = source.getPropertyPriority(name);
+      if (def[name] === value)
+        return; // exclude the defaults
+      target.setProperty(name, value, priority);
+    });
   }
 
   return clone;
 };
 
-const toHack = el => Promise.reject({
+const toWorkAround = el => Promise.reject({
+  foreignObjectsRequired: true,
   message: `
     Browser does support the foreignObject tag.
 
-    If you see this error, please consult https://github.com/kyleschuma/to-png-foh#readme for a workaround.
+    If you see this error, please consult https://github.com/kyleschuma/to-png#readme for a possible workaround.
   `,
   svg: toSvg(el)
 });
@@ -68,7 +89,14 @@ const toSvg = el => `
 const supportsForeignObjects = () =>
   document.implementation.hasFeature('http://www.w3.org/TR/SVG11/feature#Extensibility', '1.1');
 
-export default (...args) =>
-  supportsForeignObjects() ?
-    toCanvas(...args).then(canvas => canvas.toDataURL()) :
-    toHack(...args);
+const toResponse = canvas =>
+  new Promise(resolve => canvas.toBlob(blob =>
+    resolve({
+      blob,
+      dataUrl: canvas.toDataURL(),
+    })
+  ));
+
+export default (...args) => supportsForeignObjects() ?
+  toCanvas(...args).then(toResponse) :
+  toWorkAround(...args);

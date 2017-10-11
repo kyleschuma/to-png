@@ -40,8 +40,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.17/c3.min.js"></script>
   <script src="dist/to-png.js"></script>
   <script>
-
-
+  
     var source = document.getElementById('source');
     var target = document.getElementById('target');
     var copy   = document.getElementById('copy');
@@ -53,13 +52,13 @@
 
     copy.onclick = function copy() {
       toPng(source).then(function (img) {
-        target.src = img;
+        target.src = img.dataUrl;
       });
     };
 
     copyx2.onclick = function copy() {
       toPng(source, 2).then(function (img) {
-        target.src = img;
+        target.src = img.dataUrl;
       });
     };
 
