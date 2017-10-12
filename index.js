@@ -72,8 +72,8 @@ const toCanvas = (el, scale=1) =>
 const toImage = el => new Promise((resolve, reject) => {
   const image = new Image();
   image.onload = () => resolve(image);
-  image.onerror = reject;
-  image.src = `data:image/svg+xml;charset=utf-8,${toSvg(el)}`;
+  image.onerror = err => reject(err);
+  image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(toSvg(el))}`;
 });
 
 const toSvg = el => `
