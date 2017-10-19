@@ -31,6 +31,9 @@
       </div>
     </div>
     <div class="row">
+      <h5 id="time"></h5>
+    </div>
+    <div class="row">
       <img id="target" />
     </div>
   </div>
@@ -40,25 +43,30 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.17/c3.min.js"></script>
   <script src="dist/to-png.js"></script>
   <script>
-  
+
     var source = document.getElementById('source');
     var target = document.getElementById('target');
     var copy   = document.getElementById('copy');
     var copyx2 = document.getElementById('copyx2');
+    var time   = document.getElementById('time');
 
     function toPng(el, scale) {
       return window['to-png'].default(el, scale);
     }
 
     copy.onclick = function copy() {
+      const start = new Date();
       toPng(source).then(function (img) {
         target.src = img.dataUrl;
+        time.innerText = `Render time: ${new Date() - start}`;
       });
     };
 
     copyx2.onclick = function copy() {
+      const start = new Date();
       toPng(source, 2).then(function (img) {
         target.src = img.dataUrl;
+        time.innerText = `Render time: ${new Date() - start}`;
       });
     };
 

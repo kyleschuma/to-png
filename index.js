@@ -15,15 +15,17 @@ const getDefaultStyle = el => {
   return style;
 };
 
-const cloneElement = el => {
+const cloneElement = (el, cb) => {
 
   // create a copy of the element
   //
   const clone = el.cloneNode(false);
   const children = [ ...el.childNodes ];
-  children.forEach(child => {
-    clone.appendChild(cloneElement(child));
-  });
+  children.forEach(child =>
+    cloneElement(child, el =>
+      clone.appendChild(el)
+    )
+  );
 
   if (el.nodeType === Node.ELEMENT_NODE) {
 
@@ -42,7 +44,7 @@ const cloneElement = el => {
       target.setProperty(name, value, priority);
     });
   }
-
+  cb && cb(clone);
   return clone;
 };
 
