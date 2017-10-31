@@ -24,6 +24,7 @@
       <div class="six columns">
         <button id="copy">Chart to PNG</button>
         <button id="copyx2">Chart to PNG x 2</button>
+        <button id="copymany">10 PNG's</button>
       </div>
       <div id="source" class="six columns">
         <h1>Random Data</h1>
@@ -44,11 +45,12 @@
   <script src="dist/to-png.js"></script>
   <script>
 
-    var source = document.getElementById('source');
-    var target = document.getElementById('target');
-    var copy   = document.getElementById('copy');
-    var copyx2 = document.getElementById('copyx2');
-    var time   = document.getElementById('time');
+    var source    = document.getElementById('source');
+    var target    = document.getElementById('target');
+    var copy      = document.getElementById('copy');
+    var copyx2    = document.getElementById('copyx2');
+    var copymany  = document.getElementById('copymany');
+    var time      = document.getElementById('time');
 
     function toPng(el, scale) {
       return window['to-png'].default(el, scale);
@@ -67,6 +69,19 @@
       toPng(source, 2).then(function (img) {
         target.src = img.dataUrl;
         time.innerText = `Render time: ${new Date() - start}`;
+      });
+    };
+
+    copymany.onclick = function copy() {
+      const start = new Date();
+
+      const pngs = [];
+      for (let i = 0; i < 10; i++) {
+        pngs.push(toPng(source));
+      }
+      Promise.all(pngs).then(function (pngs) {
+        target.src = pngs[0].dataUrl;
+        time.innerText = `${pngs.length} Render time: ${new Date() - start}`;
       });
     };
 

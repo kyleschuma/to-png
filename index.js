@@ -15,48 +15,58 @@ const getDefaultStyle = el => {
   return style;
 };
 
-const cloneElement = (el, cb) => {
+const cloneElement = el => {
 
-  // create a copy of the element
-  //
   const clone = el.cloneNode(false);
-  const children = [ ...el.childNodes ];
-  children.forEach(child =>
-    cloneElement(child, el =>
-      clone.appendChild(el)
-    )
+  const cloneChildren = () => Promise.all(
+    [ ...el.childNodes ].map(child => cloneElement(child))
   );
+  const copyCSS = () => new Promise(accept => {
 
-  if (el.nodeType === Node.ELEMENT_NODE) {
+    setTimeout(() => {
+      // using timeout is a hack to prevent blocking of ui interaction for more
+      // information about timeout and blocking see:
+      // https://johnresig.com/blog/how-javascript-timers-work/#postcomment
+      //
+      if (el.nodeType === Node.ELEMENT_NODE) {
 
-    // apply styles
-    //
-    const def    = getDefaultStyle(el);
-    const source = window.getComputedStyle(el);
-    const target = clone.style;
+        // apply styles
+        //
+        const def    = getDefaultStyle(el);
+        const source = window.getComputedStyle(el);
+        const target = clone.style;
+        const styles = [ ...source ];
+        styles
+          .map(name => ({ name, value: source.getPropertyValue(name)}))
+          .filter(({ name, value }) => def[name] !== value)
+          .forEach(({ name, value }) => target.setProperty(name, value));
+      }
+      accept();
+    }, 10);
+  });
 
-    [ ...source ].forEach(name => {
-
-      const value    = source.getPropertyValue(name);
-      const priority = source.getPropertyPriority(name);
-      if (def[name] === value)
-        return; // exclude the defaults
-      target.setProperty(name, value, priority);
+  return Promise.resolve()
+    .then(copyCSS)
+    .then(cloneChildren)
+    .then(children => {
+      children.forEach(child => clone.appendChild(child));
+      return clone;
     });
-  }
-  cb && cb(clone);
-  return clone;
 };
 
-const toWorkAround = el => Promise.reject({
-  foreignObjectsRequired: true,
-  message: `
-    Browser does support the foreignObject tag.
+const toWorkAround = el => new Promise((accept, reject) =>
+  toSvg(el).then(svg =>
+    reject({
+      foreignObjectsRequired: true,
+      message: `
+        Browser does support the foreignObject tag.
 
-    If you see this error, please consult https://github.com/kyleschuma/to-png#readme for a possible workaround.
-  `,
-  svg: toSvg(el)
-});
+        If you see this error, please consult https://github.com/kyleschuma/to-png#readme for a possible workaround.
+      `,
+      svg,
+    })
+  )
+);
 
 const toCanvas = (el, scale=1) =>
   toImage(el).then(image => {
@@ -71,22 +81,24 @@ const toCanvas = (el, scale=1) =>
     return canvas;
   });
 
-const toImage = el => new Promise((resolve, reject) => {
+const toImage = el => toSvg(el).then(svg => new Promise((resolve, reject) => {
+
+  const src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
   const image = new Image();
   image.onload = () => resolve(image);
   image.onerror = err => reject(err);
-  image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(toSvg(el))}`;
-});
+  image.src = src;
+}));
 
-const toSvg = el => `
+const toSvg = el => cloneElement(el).then(clone => `
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="${el.offsetWidth}" height="${el.offsetHeight}">
     <foreignObject x="0" y="0" width="100%" height="100%">
-      ${new XMLSerializer().serializeToString(cloneElement(el))}
+      ${new XMLSerializer().serializeToString(clone)}
     </foreignObject>
   </svg>
-`;
+`);
 
 const supportsForeignObjects = () =>
   document.implementation.hasFeature('http://www.w3.org/TR/SVG11/feature#Extensibility', '1.1');
