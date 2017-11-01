@@ -1,20 +1,4 @@
 
-const getDefaultStyle = el => {
-
-  const dummy = document.createElement(el.tagName);
-  document.body.appendChild(dummy);
-
-  const source = window.getComputedStyle(dummy);
-  const style = [ ...source ].reduce((res, name) => {
-    res[name] = source.getPropertyValue(name);
-    return res;
-  }, {});
-
-  document.body.removeChild(dummy);
-
-  return style;
-};
-
 const cloneElement = el => {
 
   const clone = el.cloneNode(false);
@@ -32,14 +16,12 @@ const cloneElement = el => {
 
         // apply styles
         //
-        const def    = getDefaultStyle(el);
         const source = window.getComputedStyle(el);
         const target = clone.style;
         const styles = [ ...source ];
-        styles
-          .map(name => ({ name, value: source.getPropertyValue(name)}))
-          .filter(({ name, value }) => def[name] !== value)
-          .forEach(({ name, value }) => target.setProperty(name, value));
+        styles.forEach(name =>
+          target.setProperty(name, source.getPropertyValue(name))
+        );
       }
       accept();
     }, 10);
