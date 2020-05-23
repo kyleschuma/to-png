@@ -1,27 +1,32 @@
 module.exports = {
   devServer: {
-    contentBase: __dirname,
+    contentBase: `${__dirname}/docs`,
     compress: true,
-    port: 5150
+    port: 5150,
   },
-  entry: './index.js',
+  entry: {
+    './dist/': './index.js',
+    './docs/dist/': './index.js',
+  },
   output: {
-    filename: './dist/to-png.js',
+    filename: '[name]to-png.js',
     library: 'to-png',
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
   },
   module: {
-    rules: [{
-      test: /\.js$/,
-      use: [
-        {
-          loader: 'babel-loader',
-          options: {
-            presets: [ 'minify', 'es2015', 'stage-0' ]
-          }
-        },
-        'eslint-loader',
-      ]
-    }]
-  }
+    rules: [
+      {
+        test: /\.js$/,
+        use: [
+          {
+            loader: 'babel-loader',
+            options: {
+              presets: ['minify', 'es2015', 'stage-0'],
+            },
+          },
+          'eslint-loader',
+        ],
+      },
+    ],
+  },
 };
